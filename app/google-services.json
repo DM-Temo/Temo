@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "466156197861",
+    "project_id": "temo-b70fd",
+    "storage_bucket": "temo-b70fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466156197861:android:7ed61c906a4a6a6e89410c",
+        "android_client_info": {
+          "package_name": "com.example.temo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "466156197861-71lb5rtl82e6fkrtrejl28odp5d37221.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.temo",
+            "certificate_hash": "cdacbb9f86d273cda39f5db30c320bc1a388cac8"
+          }
+        },
+        {
+          "client_id": "466156197861-361n7e9kjkl4olpk591a2ov08vqmj219.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHfMxea0eCl5qKjlxITBED7a-Jg-YFID8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "466156197861-361n7e9kjkl4olpk591a2ov08vqmj219.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
