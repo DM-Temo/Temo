@@ -1,6 +1,7 @@
 package com.example.temo
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -51,10 +52,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -62,13 +64,21 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.temo.screens.AddScreen
 import com.example.temo.screens.AddTopBar
+import com.example.temo.screens.DetailScreen
+import com.example.temo.screens.DetailTopBar
 import com.example.temo.ui.theme.TemoTheme
 import com.example.temo.ui.theme.customBody
 
 class HomeActivity : ComponentActivity() {
     private val TemoViewModel: TemoViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val userName = intent.getStringExtra("userName")
+        val userId = intent.getStringExtra("userId")
+        TemoViewModel.updateUser(userName!!, userId!!)
+
         enableEdgeToEdge()
         setContent {
             TemoTheme {

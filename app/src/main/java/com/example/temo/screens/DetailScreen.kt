@@ -1,4 +1,4 @@
-package com.example.temo
+package com.example.temo.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.temo.R
 import com.example.temo.ui.theme.TemoTheme
 
 @Composable
@@ -130,4 +131,12 @@ fun DetailTopBar() {
             }
         }
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun detailPreview() {
+    TemoTheme {
+        DetailScreen(innerPadding = 0.dp)
+    }
 }

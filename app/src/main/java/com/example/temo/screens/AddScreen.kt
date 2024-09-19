@@ -172,11 +172,3 @@ fun addScreenTextField(label: String,
         shape = RoundedCornerShape(15.dp)
     )
 }
-
-@Preview(showBackground = true)
-@Composable
-fun AddPreview() {
-    TemoTheme {
-        AddScreen(innerPadding = 0.dp)
-    }
-}

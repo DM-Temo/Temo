@@ -91,8 +91,6 @@ class MainActivity : ComponentActivity() {
                                         context = contextAct!! // Activity context 사용
                                     )
                                     handleSignIn(result, contextAct) // 로그인 성공 처리
-                                    val intent = Intent(contextAct, HomeActivity::class.java)
-                                    contextAct.startActivity(intent)
                                 } catch (e: GetCredentialException) {
                                     handleFailure(e) // 실패 처리
                                 }
@@ -140,39 +138,41 @@ private fun handleSignIn(
                                 // 로그인 성공
                                 val user = FirebaseAuth.getInstance().currentUser
                                 Log.d(
-                                    "MainActivity",
-                                    "signInWithCredential:success - user: ${user?.displayName}"
+                                    "MainActivity Login",
+                                    "signInWithCredential:success - user: ${user?.displayName},${user?.uid}"
                                 )
+                                val intent = Intent(contextAct, HomeActivity::class.java)
+                                intent.putExtra("userName",user?.displayName)
+                                intent.putExtra("userId",user?.uid)
+                                contextAct.startActivity(intent)
                             } else {
                                 // 로그인 실패
                                 Log.w(
-                                    "MainActivity",
+                                    "MainActivity Login",
                                     "signInWithCredential:failure",
                                     task.exception
                                 )
                             }
                         }
-
-
                 } catch (e: GoogleIdTokenParsingException) {
-                    Log.e("MainActivity", "Received an invalid google id token response", e)
+                    Log.e("MainActivity Login", "Received an invalid google id token response", e)
                 }
             } else {
                 // 인식되지 않은 자격 증명 유형 처리
-                Log.e("MainActivity", "Unexpected type of credential")
+                Log.e("MainActivity Login", "Unexpected type of credential")
             }
         }
 
         else -> {
             // 인식되지 않은 자격 증명 유형 처리
-            Log.e("MainActivity", "Unexpected type of credential")
+            Log.e("MainActivity Login", "Unexpected type of credential")
         }
     }
 }
 
 private fun handleFailure(exception: GetCredentialException) {
     // 실패 처리 로직
-    Log.e("MainActivity", "GetCredential failed", exception)
+    Log.e("MainActivity Login", "GetCredential failed", exception)
 }
 
 @Composable
@@ -192,12 +192,5 @@ fun GoogleLoginButton(onLoginClick: () -> Unit) {
                     onLoginClick()
                 }
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    TemoTheme {
     }
 }
