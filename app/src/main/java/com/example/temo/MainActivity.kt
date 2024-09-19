@@ -1,6 +1,7 @@
 package com.example.temo
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -90,6 +91,8 @@ class MainActivity : ComponentActivity() {
                                         context = contextAct!! // Activity context 사용
                                     )
                                     handleSignIn(result, contextAct) // 로그인 성공 처리
+                                    val intent = Intent(contextAct, HomeActivity::class.java)
+                                    contextAct.startActivity(intent)
                                 } catch (e: GetCredentialException) {
                                     handleFailure(e) // 실패 처리
                                 }
