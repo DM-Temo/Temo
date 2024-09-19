@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.temo.ui.theme.TemoTheme
 import com.example.temo.ui.theme.customBody
@@ -73,14 +74,30 @@ class HomeActivity : ComponentActivity() {
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    topBar = { HomeTopBar() },
+                    topBar = {
+                        val currentRoute =
+                            navController.currentBackStackEntryAsState().value?.destination?.route
+                        when (currentRoute) {
+//                            Screen.Home.route -> HomeTopBar()
+//                            Screen.Profile.route -> ProfileTopBar()
+//                            Screen.Add.route -> AddTopBar()
+                            Screen.Detail.route -> DetailTopBar()
+                            else -> HomeTopBar()
+                        }
+                    },
                     bottomBar = { BottomNavigationBar(TemoViewModel, navController) }
                 ) { innerPadding ->
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
-                        composable(Screen.Home.route) { HomeScreen(innerPadding.calculateTopPadding()) }
+                        composable(Screen.Home.route) {
+                            HomeScreen(
+                                innerPadding.calculateTopPadding(),
+                                TemoViewModel,
+                                navController
+                            )
+                        }
 //            composable(Screen.Profile.route) { ProfileScreen(innerPadding = PaddingValues(0.dp))}
 //            composable(Screen.Add.route) { AddScreen(innerPadding = PaddingValues(0.dp))}
-//            composable(Screen.Detail.route) { DetailScreen(innerPadding = PaddingValues(0.dp))}
+                        composable(Screen.Detail.route) { DetailScreen(innerPadding.calculateTopPadding()) }
                     }
                 }
             }
@@ -99,13 +116,14 @@ sealed class Screen(
 }
 
 @Composable
-fun HomeScreen(innerPadding: Dp) {
+fun HomeScreen(innerPadding: Dp, TemoViewModel: TemoViewModel, navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
-            .padding(top = innerPadding)
+            .padding(top = innerPadding, start = 4.dp, end = 4.dp)
     ) {
         items(10) {
-            AppCard(img = R.drawable.appicon_mockup)
+            AppCard(img = R.drawable.appicon_mockup,
+                onCardClick = { TemoViewModel.navigateToDetail(navController) })
         }
     }
 }
@@ -287,8 +305,8 @@ fun BottomNavigationBar(
             }
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .offset(y = (-40).dp)
+                    .size(70.dp)
+                    .offset(y = (-45).dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
@@ -310,9 +328,12 @@ fun BottomNavigationBar(
 }
 
 @Composable
-fun AppCard(img: Int) {
+fun AppCard(
+    img: Int,
+    onCardClick: () -> Unit
+) {
     Card(
-        onClick = { /*TODO*/ },
+        onClick = { onCardClick() },
         modifier = Modifier
             .fillMaxWidth()
             .height(120.dp)
@@ -340,10 +361,14 @@ fun AppCard(img: Int) {
                     .weight(1f),
                 verticalArrangement = Arrangement.SpaceAround
             ) {
-                Text(text = "appName",
-                    style = MaterialTheme.typography.bodyLarge)
-                Text(text = "createrName",
-                    style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "appName",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "creatorName",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Column(
                 modifier = Modifier
@@ -354,24 +379,15 @@ fun AppCard(img: Int) {
             ) {
                 Box(modifier = Modifier) {
                     Image(
-                        painter = painterResource(id = R.drawable.icon_next),
+                        painter = painterResource(id = R.drawable.icon_arrow_next),
                         contentDescription = "nextIcon"
                     )
                 }
-                Text(text = "20 Credits",
-                    style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "20 Credits",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomePreview() {
-    TemoTheme {
-//        HomeTopBar()
-//        TopSearchBar()
-//        BottomNavigationBar()
-        AppCard(img = R.drawable.appicon_mockup)
     }
 }
