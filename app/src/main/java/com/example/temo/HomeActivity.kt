@@ -5,12 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,6 +52,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -68,31 +70,43 @@ class HomeActivity : ComponentActivity() {
         setContent {
             TemoTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Screen.Home.route) {
-                    composable(Screen.Home.route) { HomeScreen(innerPadding = PaddingValues(0.dp)) }
-//            composable(Screen.Profile.route) { ProfileScreen(innerPadding = PaddingValues(0.dp))}
-//            composable(Screen.Add.route) { AddScreen(innerPadding = PaddingValues(0.dp))}
-//            composable(Screen.Detail.route) { DetailScreen(innerPadding = PaddingValues(0.dp))}
-                }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = { HomeTopBar() },
                     bottomBar = { BottomNavigationBar(TemoViewModel, navController) }
                 ) { innerPadding ->
-                    HomeScreen(innerPadding)
+                    NavHost(navController = navController, startDestination = Screen.Home.route) {
+                        composable(Screen.Home.route) { HomeScreen(innerPadding.calculateTopPadding()) }
+//            composable(Screen.Profile.route) { ProfileScreen(innerPadding = PaddingValues(0.dp))}
+//            composable(Screen.Add.route) { AddScreen(innerPadding = PaddingValues(0.dp))}
+//            composable(Screen.Detail.route) { DetailScreen(innerPadding = PaddingValues(0.dp))}
+                    }
                 }
             }
         }
     }
 }
 
+sealed class Screen(
+    val route: String,
+    val icon: Int? = null
+) {
+    object Home : Screen("home", R.drawable.icon_home)
+    object Profile : Screen("profile", R.drawable.icon_person)
+    object Add : Screen("add", R.drawable.icon_add)
+    object Detail : Screen("detail")
+}
+
 @Composable
-fun HomeScreen(innerPadding: PaddingValues) {
+fun HomeScreen(innerPadding: Dp) {
     LazyColumn(
         modifier = Modifier
-            .padding(paddingValues = innerPadding)
+            .padding(top = innerPadding)
     ) {
-
+        items(10) {
+            AppCard(img = R.drawable.appicon_mockup)
+        }
     }
 }
 
@@ -194,6 +208,7 @@ fun BottomNavigationBar(
             .fillMaxWidth()
             .height(250.dp)
             .padding(10.dp)
+            .background(Color.Transparent)
     ) {
 
         var boxSize by remember { mutableStateOf(IntSize.Zero) }
@@ -201,7 +216,8 @@ fun BottomNavigationBar(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp),
+                .height(250.dp)
+                .background(Color.Transparent),
             contentAlignment = Alignment.BottomCenter
         ) {
             Box(modifier = Modifier
@@ -293,16 +309,61 @@ fun BottomNavigationBar(
     }
 }
 
-sealed class Screen(
-    val route: String,
-    val icon: Int? = null
-) {
-    object Home : Screen("home", R.drawable.icon_home)
-    object Profile : Screen("profile", R.drawable.icon_person)
-    object Add : Screen("add", R.drawable.icon_add)
-    object Detail : Screen("detail")
+@Composable
+fun AppCard(img: Int) {
+    Card(
+        onClick = { /*TODO*/ },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .padding(6.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(108.dp)
+                    .padding(6.dp)
+                    .clip(shape = RoundedCornerShape(10.dp))
+            ) {
+                Image(painter = painterResource(id = img), contentDescription = "appImg")
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(vertical = 20.dp)
+                    .padding(start = 6.dp)
+                    .weight(1f),
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
+                Text(text = "appName",
+                    style = MaterialTheme.typography.bodyLarge)
+                Text(text = "createrName",
+                    style = MaterialTheme.typography.bodyMedium)
+            }
+            Column(
+                modifier = Modifier
+                    .height(60.dp)
+                    .padding(end = 8.dp),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.End
+            ) {
+                Box(modifier = Modifier) {
+                    Image(
+                        painter = painterResource(id = R.drawable.icon_next),
+                        contentDescription = "nextIcon"
+                    )
+                }
+                Text(text = "20 Credits",
+                    style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+    }
 }
-
 
 @Preview(showBackground = true)
 @Composable
@@ -311,5 +372,6 @@ fun HomePreview() {
 //        HomeTopBar()
 //        TopSearchBar()
 //        BottomNavigationBar()
+        AppCard(img = R.drawable.appicon_mockup)
     }
 }
