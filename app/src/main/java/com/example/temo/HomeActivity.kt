@@ -60,6 +60,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.temo.screens.AddScreen
+import com.example.temo.screens.AddTopBar
 import com.example.temo.ui.theme.TemoTheme
 import com.example.temo.ui.theme.customBody
 
@@ -80,7 +82,7 @@ class HomeActivity : ComponentActivity() {
                         when (currentRoute) {
 //                            Screen.Home.route -> HomeTopBar()
 //                            Screen.Profile.route -> ProfileTopBar()
-//                            Screen.Add.route -> AddTopBar()
+                            Screen.Add.route -> AddTopBar()
                             Screen.Detail.route -> DetailTopBar()
                             else -> HomeTopBar()
                         }
@@ -95,8 +97,8 @@ class HomeActivity : ComponentActivity() {
                                 navController
                             )
                         }
-//            composable(Screen.Profile.route) { ProfileScreen(innerPadding = PaddingValues(0.dp))}
-//            composable(Screen.Add.route) { AddScreen(innerPadding = PaddingValues(0.dp))}
+//            composable(Screen.Profile.route) { ProfileScreen(innerPadding.calculateTopPadding())}
+                        composable(Screen.Add.route) { AddScreen(innerPadding.calculateTopPadding()) }
                         composable(Screen.Detail.route) { DetailScreen(innerPadding.calculateTopPadding()) }
                     }
                 }
