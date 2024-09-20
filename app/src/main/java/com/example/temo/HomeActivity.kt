@@ -51,7 +51,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -62,14 +61,24 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.temo.screens.AddScreen
 import com.example.temo.screens.AddTopBar
+import com.example.temo.screens.DetailScreen
+import com.example.temo.screens.DetailTopBar
+import com.example.temo.screens.ProfileScreen
+import com.example.temo.screens.ProfileTopBar
 import com.example.temo.ui.theme.TemoTheme
 import com.example.temo.ui.theme.customBody
 
 class HomeActivity : ComponentActivity() {
-    private val TemoViewModel: TemoViewModel by viewModels()
+    private val temoViewModel: TemoViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
+
+        val userName = intent.getStringExtra("userName")
+        val userId = intent.getStringExtra("userId")
+        temoViewModel.updateUser(userName!!, userId!!)
+
+        enableEdgeToEdge()
         setContent {
             TemoTheme {
                 val navController = rememberNavController()
@@ -81,23 +90,29 @@ class HomeActivity : ComponentActivity() {
                             navController.currentBackStackEntryAsState().value?.destination?.route
                         when (currentRoute) {
 //                            Screen.Home.route -> HomeTopBar()
-//                            Screen.Profile.route -> ProfileTopBar()
+                            Screen.Profile.route -> ProfileTopBar()
                             Screen.Add.route -> AddTopBar()
                             Screen.Detail.route -> DetailTopBar()
                             else -> HomeTopBar()
                         }
                     },
-                    bottomBar = { BottomNavigationBar(TemoViewModel, navController) }
+                    bottomBar = { BottomNavigationBar(temoViewModel, navController) }
                 ) { innerPadding ->
                     NavHost(navController = navController, startDestination = Screen.Home.route) {
                         composable(Screen.Home.route) {
                             HomeScreen(
                                 innerPadding.calculateTopPadding(),
-                                TemoViewModel,
+                                temoViewModel,
                                 navController
                             )
                         }
-//            composable(Screen.Profile.route) { ProfileScreen(innerPadding.calculateTopPadding())}
+                        composable(Screen.Profile.route) {
+                            ProfileScreen(
+                                innerPadding = innerPadding.calculateTopPadding(),
+                                temoViewModel = temoViewModel,
+                                navController = navController
+                            )
+                        }
                         composable(Screen.Add.route) { AddScreen(innerPadding.calculateTopPadding()) }
                         composable(Screen.Detail.route) { DetailScreen(innerPadding.calculateTopPadding()) }
                     }
@@ -111,21 +126,21 @@ sealed class Screen(
     val route: String,
     val icon: Int? = null
 ) {
-    object Home : Screen("home", R.drawable.icon_home)
-    object Profile : Screen("profile", R.drawable.icon_person)
-    object Add : Screen("add", R.drawable.icon_add)
-    object Detail : Screen("detail")
+    data object Home : Screen("home", R.drawable.icon_home)
+    data object Profile : Screen("profile", R.drawable.icon_person)
+    data object Add : Screen("add", R.drawable.icon_add)
+    data object Detail : Screen("detail")
 }
 
 @Composable
-fun HomeScreen(innerPadding: Dp, TemoViewModel: TemoViewModel, navController: NavHostController) {
+fun HomeScreen(innerPadding: Dp, temoViewModel: TemoViewModel, navController: NavHostController) {
     LazyColumn(
         modifier = Modifier
             .padding(top = innerPadding, start = 4.dp, end = 4.dp)
     ) {
         items(10) {
             AppCard(img = R.drawable.appicon_mockup,
-                onCardClick = { TemoViewModel.navigateToDetail(navController) })
+                onCardClick = { temoViewModel.navigateToDetail(navController) })
         }
     }
 }
@@ -138,7 +153,7 @@ fun HomeTopBar() {
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
-        modifier = Modifier.height(200.dp),
+        modifier = Modifier.height(160.dp),
         title = {
             Column(
                 modifier = Modifier
@@ -220,7 +235,7 @@ fun TopSearchBar(modifier: Modifier) {
 
 @Composable
 fun BottomNavigationBar(
-    TemoViewModel: TemoViewModel, navController: NavHostController
+    temoViewModel: TemoViewModel, navController: NavHostController
 ) {
     BottomAppBar(
         containerColor = Color.Transparent,
@@ -280,7 +295,7 @@ fun BottomNavigationBar(
                                 .size(36.dp)
                                 .pointerInput(Unit) {
                                     detectTapGestures {
-                                        TemoViewModel.navigateToHome(navController)
+                                        temoViewModel.navigateToHome(navController)
                                     }
                                 }
                         )
@@ -297,7 +312,7 @@ fun BottomNavigationBar(
                                 .size(36.dp)
                                 .pointerInput(Unit) {
                                     detectTapGestures {
-                                        TemoViewModel.navigateToProfile(navController)
+                                        temoViewModel.navigateToProfile(navController)
                                     }
                                 }
                         )
@@ -320,7 +335,7 @@ fun BottomNavigationBar(
                         .size(50.dp)
                         .pointerInput(Unit) {
                             detectTapGestures {
-                                TemoViewModel.navigateToAdd(navController)
+                                temoViewModel.navigateToAdd(navController)
                             }
                         }
                 )

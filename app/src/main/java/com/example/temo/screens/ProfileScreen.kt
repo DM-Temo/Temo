@@ -13,38 +13,41 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.temo.AppCard
 import com.example.temo.R
+import com.example.temo.TemoViewModel
+import com.example.temo.ui.theme.TemoTheme
 
 @Composable
-fun AddScreen(innerPadding: Dp) {
+fun ProfileScreen(
+    innerPadding: Dp,
+    temoViewModel: TemoViewModel,
+    navController: NavController
+) {
     LazyColumn(
         modifier = Modifier
             .padding(top = innerPadding)
             .fillMaxSize()
     ) {
+        val userState = temoViewModel.userFlow.value
         item {
             Box(
                 modifier = Modifier
@@ -62,10 +65,10 @@ fun AddScreen(innerPadding: Dp) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.icon_add_circle),
-                        contentDescription = "appImg"
+                        contentDescription = "Profile Photo"
                     )
                     Text(
-                        text = "Add App Icon",
+                        text = "Add Your Photo",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -74,28 +77,40 @@ fun AddScreen(innerPadding: Dp) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AddScreenTextField(label = "App Name")
-                AddScreenTextField(label = "Creator")
-                AddScreenTextField(label = "App Link")
-                AddScreenTextField(label = "App Description", Modifier.height(240.dp))
-            }
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Add")
+                Text(text = userState.userName)
+                Text(text = "App Counts : 10")
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Button(onClick = { /*TODO*/ }) {
+                        Text(text = "Config")
+                    }
+                }
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp)) {
+                    Text(text = "App List",
+                        modifier = Modifier.padding(vertical = 4.dp))
+                    HorizontalDivider()
                 }
             }
+        }
+        items(10) {
+            AppCard(img = R.drawable.appicon_mockup,
+                onCardClick = { temoViewModel.navigateToDetail(navController) })
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddTopBar() {
+fun ProfileTopBar() {
     TopAppBar(
         colors = topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -118,7 +133,7 @@ fun AddTopBar() {
                     )
                 }
                 Text(
-                    "Add App",
+                    "User Profile",
                     style = MaterialTheme.typography.headlineLarge,
                     modifier = Modifier
                         .weight(1f)
@@ -138,30 +153,12 @@ fun AddTopBar() {
     )
 }
 
+@Preview(showBackground = true)
 @Composable
-fun AddScreenTextField(label: String,
-                       modifier: Modifier = Modifier) {
-    var input by remember { mutableStateOf("") }
-    var isFocused by remember { mutableStateOf(false) }
-    OutlinedTextField(
-        value = input,
-        onValueChange = { input = it },
-        modifier = modifier
-            .fillMaxWidth()
-            .onFocusChanged { focusState ->
-                isFocused = focusState.isFocused
-            },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color.White
-        ),
-        label = {
-            Text(
-                text = label,
-                modifier = Modifier.alpha(
-                    if (isFocused) 1f else 0.5f
-                )
-            )
-        },
-        shape = RoundedCornerShape(15.dp)
-    )
+fun ProfilePreview() {
+    TemoTheme {
+        val temoViewModel = TemoViewModel()
+        val navController = rememberNavController()
+        ProfileScreen(innerPadding = 0.dp, temoViewModel, navController)
+    }
 }
