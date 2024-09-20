@@ -69,7 +69,7 @@ class HomeActivity : ComponentActivity() {
     private val TemoViewModel: TemoViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             TemoTheme {
                 val navController = rememberNavController()
@@ -138,7 +138,7 @@ fun HomeTopBar() {
             containerColor = MaterialTheme.colorScheme.primaryContainer,
             titleContentColor = MaterialTheme.colorScheme.primary,
         ),
-        modifier = Modifier.height(160.dp),
+        modifier = Modifier.height(200.dp),
         title = {
             Column(
                 modifier = Modifier

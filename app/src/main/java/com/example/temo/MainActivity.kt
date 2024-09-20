@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
             .setAutoSelectEnabled(false)
             .build()
 
-        enableEdgeToEdge()
+//        enableEdgeToEdge()
         setContent {
             TemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -162,7 +162,6 @@ private fun handleSignIn(
                 Log.e("MainActivity", "Unexpected type of credential")
             }
         }
-
         else -> {
             // 인식되지 않은 자격 증명 유형 처리
             Log.e("MainActivity", "Unexpected type of credential")
