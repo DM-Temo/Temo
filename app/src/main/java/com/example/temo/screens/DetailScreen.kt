@@ -56,7 +56,7 @@ fun DetailScreen(innerPadding: Dp) {
                     .padding(12.dp)
             ) {
                 val detailList = listOf("App Name", "Creator", "Post Date", "Credits")
-                detailList.forEach { it ->
+                detailList.forEach {
                     Row(
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -72,14 +72,15 @@ fun DetailScreen(innerPadding: Dp) {
                     }
                 }
             }
-            HorizontalDivider()
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp))
             Text(text = "App Description",
                 style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(top = 8.dp, start = 8.dp))
             Text(text = "test",
                 modifier = Modifier.padding(top = 8.dp, start = 8.dp, bottom = 24.dp))
-            Box(modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center) {
+            Column(modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = "Current Applicants : 5/20")
                 Button(onClick = { /*TODO*/ }) {
                     Text(text = "Test Now!")
                 }
@@ -135,7 +136,7 @@ fun DetailTopBar() {
 
 @Preview(showBackground = true)
 @Composable
-fun detailPreview() {
+fun DetailPreview() {
     TemoTheme {
         DetailScreen(innerPadding = 0.dp)
     }

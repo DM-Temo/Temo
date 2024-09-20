@@ -1,13 +1,12 @@
 package com.example.temo
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
-class TemoViewModel() : ViewModel() {
+class TemoViewModel : ViewModel() {
     val userFlow = MutableStateFlow(User(userName = "", userId = ""))
 
     fun navigateToHome(navController: NavController) {
