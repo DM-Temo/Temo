@@ -1,5 +1,6 @@
 package com.example.temo
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,8 +14,8 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class TemoViewModel : ViewModel() {
-//    private val firebaseDB = Firebase.firestore
-//    private val fireStorage = Firebase.storage
+    private val firebaseDB = Firebase.firestore
+    private val fireStorage = Firebase.storage.reference
     val userFlow = MutableStateFlow(User(userName = "", userId = ""))
 
     fun navigateToHome(navController: NavController) {
@@ -51,15 +52,29 @@ class TemoViewModel : ViewModel() {
         )
     }
 
-//    fun addApp(appData: App,
-//               onSuccess: () -> Unit) {
-//        firebaseDB.collection("Apps").document(appData.userId).set(appData)
-//            .addOnSuccessListener { onSuccess()
-//                Log.d("firestore", "success")}
-//            .addOnFailureListener {
-//                Log.e("firestore", "ee")
-//            }
-//    }
+    fun addApp(
+        appData: App,
+        onSuccess: () -> Unit
+    ) {
+        firebaseDB.collection("Apps").document(appData.userId).collection(appData.appId).add(appData)
+            .addOnSuccessListener {
+                onSuccess()
+                Log.d("firestore", "success")
+            }
+            .addOnFailureListener {
+                Log.e("firestore", "ee")
+            }
+    }
+
+    fun addAppIcon(
+        appIconData: AppIcon,
+        onSuccess: () -> Unit
+    ) {
+        fireStorage.child("appIcon/${appIconData.userId}/${appIconData.appId}.jpg")
+            .putFile(appIconData.imgUrl).addOnSuccessListener {
+                onSuccess()
+            }
+    }
 }
 
 data class User(
@@ -71,15 +86,16 @@ data class App(
     val userId: String,
     var appName: String,
     var creator: String,
-    val releaseDate: LocalDate,
+    val releaseDate: String,
     var appLink: String,
     var appDescription: String,
-    val appId: String = userId+releaseDate.toString()
+    val appId: String = userId + releaseDate,
+    var tester: Int = 0
 )
 
 data class AppIcon(
     val userId: String,
-    val releaseDate: LocalDate,
-    val appId: String = userId+releaseDate.toString(),
-    val imgUrl: Int
+    val releaseDate: String,
+    val imgUrl: Uri,
+    val appId: String = userId + releaseDate
 )

@@ -1,8 +1,13 @@
 package com.example.temo.screens
 
+import android.net.Uri
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,13 +40,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.temo.App
+import com.example.temo.AppIcon
 import com.example.temo.R
 import com.example.temo.TemoViewModel
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Composable
 fun AddScreen(
@@ -59,30 +71,49 @@ fun AddScreen(
             var creator by remember { mutableStateOf("") }
             var appLink by remember { mutableStateOf("") }
             var appDescription by remember { mutableStateOf("") }
+            var imageUri by remember {
+                mutableStateOf<Uri?>(null)
+            }
+            val pickMedia =
+                rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                    imageUri = uri
+                }
+
             Box(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .fillMaxWidth()
-                    .height(108.dp),
+                    .height(108.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .size(108.dp)
-                        .border(width = 1.dp, color = Color.Gray)
-                ) {
+                if (imageUri == null) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .size(108.dp)
+                            .border(width = 1.dp, color = Color.Gray)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon_add_circle),
+                            contentDescription = "defaultAppImg"
+                        )
+                        Text(
+                            text = "Add App Icon",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                } else
                     Image(
-                        painter = painterResource(id = R.drawable.icon_add_circle),
+                        painter = rememberAsyncImagePainter(imageUri),
                         contentDescription = "appImg"
                     )
-                    Text(
-                        text = "Add App Icon",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
             }
             Column(
                 modifier = Modifier
@@ -115,17 +146,23 @@ fun AddScreen(
             ) {
                 Button(onClick = {
                     try {
-                        val localTimeNow = getLocalTimeNow()
+                        val localTimeNow = LocalDateTime.now()
                         val addAppData = App(
                             userId = userDataState.userId,
                             appName = appName,
                             creator = creator,
-                            releaseDate = localTimeNow,
+                            releaseDate = localTimeNow.toString(),
                             appLink = appLink,
                             appDescription = appDescription
                         )
+                        val addAppIconData = AppIcon(
+                            userId = userDataState.userId,
+                            releaseDate = localTimeNow.toString(),
+                            imgUrl = imageUri!!
+                        )
                         Log.d("test", "$addAppData")
-//                        temoViewModel.addApp(addAppData, onSuccess = {})
+                        temoViewModel.addApp(addAppData, onSuccess = {})
+                        temoViewModel.addAppIcon(addAppIconData, onSuccess = {})
                     } catch (e: Exception) {
                         Log.e("ButtonClick", "Error: ${e.message}", e)
                     }
@@ -212,8 +249,4 @@ fun AddScreenTextField(
         },
         shape = RoundedCornerShape(15.dp)
     )
-}
-
-fun getLocalTimeNow() : LocalDate {
-    return LocalDate.now()
 }

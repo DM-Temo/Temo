@@ -269,13 +269,3 @@ fun FloatCircleButton(
         )
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun HomePreview() {
-    TemoTheme {
-        val temoViewModel = TemoViewModel()
-        val navController = rememberNavController()
-        MainScaffold(temoViewModel, navController)
-    }
-}
