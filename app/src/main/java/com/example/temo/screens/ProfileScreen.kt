@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.temo.AppCard
 import com.example.temo.R
 import com.example.temo.TemoViewModel
 import com.example.temo.ui.theme.TemoTheme
@@ -102,7 +101,7 @@ fun ProfileScreen(
             }
         }
         items(10) {
-            AppCard(img = R.drawable.appicon_mockup,
+            HomeAppCard(img = R.drawable.appicon_mockup,
                 onCardClick = { temoViewModel.navigateToDetail(navController) })
         }
     }

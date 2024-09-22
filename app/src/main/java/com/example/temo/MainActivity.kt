@@ -49,7 +49,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         auth = Firebase.auth
-
         val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
             .setFilterByAuthorizedAccounts(false)
             .setServerClientId(getString(R.string.default_web_client_id))
@@ -60,7 +59,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             TemoTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-
                     val contextAct = LocalContext.current as Activity?
                     val context = LocalContext.current
 

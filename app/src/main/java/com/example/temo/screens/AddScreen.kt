@@ -1,11 +1,13 @@
 package com.example.temo.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,16 +38,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.temo.App
 import com.example.temo.R
+import com.example.temo.TemoViewModel
+import java.time.LocalDate
 
 @Composable
-fun AddScreen(innerPadding: Dp) {
+fun AddScreen(
+    innerPadding: Dp,
+    temoViewModel: TemoViewModel
+) {
     LazyColumn(
         modifier = Modifier
             .padding(top = innerPadding)
             .fillMaxSize()
     ) {
+        val userDataState = temoViewModel.userFlow.value
         item {
+            var appName by remember { mutableStateOf("") }
+            var creator by remember { mutableStateOf("") }
+            var appLink by remember { mutableStateOf("") }
+            var appDescription by remember { mutableStateOf("") }
             Box(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
@@ -76,19 +89,51 @@ fun AddScreen(innerPadding: Dp) {
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
             ) {
-                AddScreenTextField(label = "App Name")
-                AddScreenTextField(label = "Creator")
-                AddScreenTextField(label = "App Link")
-                AddScreenTextField(label = "App Description", Modifier.height(240.dp))
+                AddScreenTextField(
+                    input = appName,
+                    label = "App Name",
+                    onValueChange = { appName = it }
+                )
+                AddScreenTextField(
+                    input = creator,
+                    label = "Creator",
+                    onValueChange = { creator = it })
+                AddScreenTextField(
+                    input = appLink,
+                    label = "App Link",
+                    onValueChange = { appLink = it })
+                AddScreenTextField(
+                    input = appDescription,
+                    label = "App Description",
+                    onValueChange = { appDescription = it },
+                    Modifier.height(240.dp)
+                )
             }
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(onClick = { /*TODO*/ }) {
+                Button(onClick = {
+                    try {
+                        val localTimeNow = getLocalTimeNow()
+                        val addAppData = App(
+                            userId = userDataState.userId,
+                            appName = appName,
+                            creator = creator,
+                            releaseDate = localTimeNow,
+                            appLink = appLink,
+                            appDescription = appDescription
+                        )
+                        Log.d("test", "$addAppData")
+//                        temoViewModel.addApp(addAppData, onSuccess = {})
+                    } catch (e: Exception) {
+                        Log.e("ButtonClick", "Error: ${e.message}", e)
+                    }
+                }) {
                     Text(text = "Add")
                 }
             }
+            Spacer(modifier = Modifier.size(200.dp))
         }
     }
 }
@@ -139,13 +184,16 @@ fun AddTopBar() {
 }
 
 @Composable
-fun AddScreenTextField(label: String,
-                       modifier: Modifier = Modifier) {
-    var input by remember { mutableStateOf("") }
+fun AddScreenTextField(
+    input: String,
+    label: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var isFocused by remember { mutableStateOf(false) }
     OutlinedTextField(
         value = input,
-        onValueChange = { input = it },
+        onValueChange = { onValueChange(it) },
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { focusState ->
@@ -164,4 +212,8 @@ fun AddScreenTextField(label: String,
         },
         shape = RoundedCornerShape(15.dp)
     )
+}
+
+fun getLocalTimeNow() : LocalDate {
+    return LocalDate.now()
 }
