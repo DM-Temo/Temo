@@ -8,7 +8,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,11 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,11 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -59,11 +50,12 @@ import com.example.temo.screens.HomeTopBar
 import com.example.temo.screens.ProfileScreen
 import com.example.temo.screens.ProfileTopBar
 import com.example.temo.ui.theme.TemoTheme
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.example.temo.viewmodels.NavViewModel
+import com.example.temo.viewmodels.TemoViewModel
 
 class HomeActivity : ComponentActivity() {
     private val temoViewModel: TemoViewModel by viewModels()
+    private val navViewModel: NavViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,18 +64,16 @@ class HomeActivity : ComponentActivity() {
         val userId = intent.getStringExtra("userId")
         temoViewModel.updateUser(userName!!, userId!!)
 
-        val firebaseDB = Firebase.firestore
-
         enableEdgeToEdge()
         setContent {
+            temoViewModel
             TemoTheme {
+                temoViewModel.getApps()
                 val navController = rememberNavController()
-                var innerPadding by remember { mutableStateOf(PaddingValues(0.dp)) }
-
-
 
                 MainScaffold(
                     temoViewModel = temoViewModel,
+                    navViewModel = navViewModel,
                     navController = navController
                 )
             }
@@ -104,6 +94,7 @@ sealed class Screen(
 @Composable
 fun MainScaffold(
     temoViewModel: TemoViewModel,
+    navViewModel: NavViewModel,
     navController: NavHostController
 ) {
     Scaffold(
@@ -125,6 +116,7 @@ fun MainScaffold(
                     HomeScreen(
                         innerPadding = innerPadding.calculateTopPadding(),
                         temoViewModel = temoViewModel,
+                        navViewModel = navViewModel,
                         navController = navController
                     )
                 }
@@ -132,6 +124,7 @@ fun MainScaffold(
                     ProfileScreen(
                         innerPadding = innerPadding.calculateTopPadding(),
                         temoViewModel = temoViewModel,
+                        navViewModel = navViewModel,
                         navController = navController
                     )
                 }
@@ -144,35 +137,28 @@ fun MainScaffold(
                 composable(Screen.Detail.route) { DetailScreen(innerPadding.calculateTopPadding()) }
             }
         },
-        bottomBar = { BottomNavigationBar(temoViewModel, navController) },
-//        floatingActionButton = {
-//            FloatCircleButton(
-//                temoViewModel = temoViewModel,
-//                navController = navController
-//            )
-//        },
-//        floatingActionButtonPosition = FabPosition.Center
+        bottomBar = { BottomNavigationBar(navViewModel, navController) },
     )
 }
 
 
 @Composable
 fun BottomNavigationBar(
-    temoViewModel: TemoViewModel, navController: NavHostController
+    navViewModel: NavViewModel,
+    navController: NavHostController
 ) {
     Box(modifier = Modifier
         .fillMaxWidth()
         .wrapContentSize(),
         contentAlignment = Alignment.Center) {
         FloatCircleButton(
-            temoViewModel,
+            navViewModel,
             navController
         )
     }
     BottomAppBar(
         containerColor = Color.Transparent,
         modifier = Modifier
-//            .fillMaxWidth()
             .padding(10.dp)
             .background(Color.Transparent)
     ) {
@@ -212,7 +198,7 @@ fun BottomNavigationBar(
                             .size(36.dp)
                             .pointerInput(Unit) {
                                 detectTapGestures {
-                                    temoViewModel.navigateToHome(navController)
+                                    navViewModel.navigateToHome(navController)
                                 }
                             }
                     )
@@ -229,7 +215,7 @@ fun BottomNavigationBar(
                             .size(36.dp)
                             .pointerInput(Unit) {
                                 detectTapGestures {
-                                    temoViewModel.navigateToProfile(navController)
+                                    navViewModel.navigateToProfile(navController)
                                 }
                             }
                     )
@@ -242,10 +228,9 @@ fun BottomNavigationBar(
 
 @Composable
 fun FloatCircleButton(
-    temoViewModel: TemoViewModel,
+    navViewModel: NavViewModel,
     navController: NavHostController
 ) {
-
     Box(
         modifier = Modifier
             .size(70.dp)
@@ -263,7 +248,7 @@ fun FloatCircleButton(
                 .size(50.dp)
                 .pointerInput(Unit) {
                     detectTapGestures {
-                        temoViewModel.navigateToAdd(navController)
+                        navViewModel.navigateToAdd(navController)
                     }
                 }
         )

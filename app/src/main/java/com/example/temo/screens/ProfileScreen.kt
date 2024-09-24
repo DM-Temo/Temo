@@ -31,14 +31,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.temo.viewmodels.NavViewModel
 import com.example.temo.R
-import com.example.temo.TemoViewModel
+import com.example.temo.viewmodels.TemoViewModel
 import com.example.temo.ui.theme.TemoTheme
 
 @Composable
 fun ProfileScreen(
     innerPadding: Dp,
     temoViewModel: TemoViewModel,
+    navViewModel: NavViewModel,
     navController: NavController
 ) {
     LazyColumn(
@@ -101,8 +103,10 @@ fun ProfileScreen(
             }
         }
         items(10) {
-            HomeAppCard(img = R.drawable.appicon_mockup,
-                onCardClick = { temoViewModel.navigateToDetail(navController) })
+            HomeAppCard(img = null,
+                appName = "appName",
+                creator = "creator",
+                onCardClick = { navViewModel.navigateToDetail(navController) })
         }
     }
 }
@@ -158,6 +162,6 @@ fun ProfilePreview() {
     TemoTheme {
         val temoViewModel = TemoViewModel()
         val navController = rememberNavController()
-        ProfileScreen(innerPadding = 0.dp, temoViewModel, navController)
+//        ProfileScreen(innerPadding = 0.dp, temoViewModel, navController)
     }
 }

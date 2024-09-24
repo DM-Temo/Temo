@@ -41,19 +41,15 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
-import com.example.temo.App
-import com.example.temo.AppIcon
+import com.example.temo.viewmodels.App
+import com.example.temo.viewmodels.AppIcon
 import com.example.temo.R
-import com.example.temo.TemoViewModel
-import java.time.LocalDate
+import com.example.temo.viewmodels.TemoViewModel
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 @Composable
 fun AddScreen(

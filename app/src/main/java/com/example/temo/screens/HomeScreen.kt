@@ -1,5 +1,6 @@
 package com.example.temo.screens
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,19 +38,48 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieClipSpec
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieAnimatable
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.example.temo.viewmodels.App
+import com.example.temo.viewmodels.NavViewModel
 import com.example.temo.R
-import com.example.temo.TemoViewModel
+import com.example.temo.viewmodels.TemoViewModel
 import com.example.temo.ui.theme.customBody
 
 @Composable
-fun HomeScreen(innerPadding: Dp, temoViewModel: TemoViewModel, navController: NavHostController) {
+fun HomeScreen(
+    innerPadding: Dp,
+    temoViewModel: TemoViewModel,
+    navViewModel: NavViewModel,
+    navController: NavHostController
+) {
+    val appSnapshot = temoViewModel.appQueryFlow.collectAsState(initial = null)
+    val appListValue = appSnapshot.value?.documents ?: emptyList()
+    val appInit = App("","Loading..","Loading..","","","","",0,0)
+
     LazyColumn(
         modifier = Modifier
             .padding(top = innerPadding, start = 4.dp, end = 4.dp)
     ) {
-        items(10) {
-            HomeAppCard(img = R.drawable.appicon_mockup,
-                onCardClick = { temoViewModel.navigateToDetail(navController) })
+        items(appListValue) { document ->
+            val appData = document.toObject(App::class.java) ?: appInit
+            temoViewModel.getAppIcon(
+                userId = appData.userId,
+                appId = appData.appId
+            )
+            val appIcon = temoViewModel.imageUriFlow.collectAsState(initial = null).value
+            HomeAppCard(img = appIcon,
+                appName = appData.appName,
+                creator = appData.creator,
+                onCardClick = {
+                    navViewModel.navigateToDetail(
+                        navController
+                    )
+                })
         }
     }
 }
@@ -141,7 +174,9 @@ fun TopSearchBar(modifier: Modifier) {
 
 @Composable
 fun HomeAppCard(
-    img: Int,
+    img: Uri?,
+    appName: String,
+    creator: String,
     onCardClick: () -> Unit
 ) {
     Card(
@@ -163,7 +198,14 @@ fun HomeAppCard(
                     .padding(6.dp)
                     .clip(shape = RoundedCornerShape(10.dp))
             ) {
-                Image(painter = painterResource(id = img), contentDescription = "appImg")
+                if (img == null) {
+                    LottieImg(res = R.raw.lottie_loading)
+                } else {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = img),
+                        contentDescription = "appImg"
+                    )
+                }
             }
             Column(
                 modifier = Modifier
@@ -174,11 +216,11 @@ fun HomeAppCard(
                 verticalArrangement = Arrangement.SpaceAround
             ) {
                 Text(
-                    text = "appName",
+                    text = appName,
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "creatorName",
+                    text = creator,
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -202,4 +244,21 @@ fun HomeAppCard(
             }
         }
     }
+}
+
+@Composable
+fun LottieImg(
+    res: Int
+) {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(res))
+    val lottieAnimatable = rememberLottieAnimatable()
+    LaunchedEffect(key1 = composition) {
+        lottieAnimatable.animate(
+            composition = composition,
+            clipSpec = LottieClipSpec.Progress(0f, 1f),
+            initialProgress = 0f
+        )
+    }
+    LottieAnimation(composition = composition,
+        progress = { lottieAnimatable.progress })
 }
