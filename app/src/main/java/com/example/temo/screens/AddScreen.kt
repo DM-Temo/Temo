@@ -49,6 +49,7 @@ import com.example.temo.viewmodels.App
 import com.example.temo.viewmodels.AppIcon
 import com.example.temo.R
 import com.example.temo.viewmodels.TemoViewModel
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @Composable
@@ -143,17 +144,19 @@ fun AddScreen(
                 Button(onClick = {
                     try {
                         val localTimeNow = LocalDateTime.now()
+                        val localDateNow = LocalDate.now()
                         val addAppData = App(
                             userId = userDataState.userId,
                             appName = appName,
                             creator = creator,
-                            releaseDate = localTimeNow.toString(),
+                            postDate = localDateNow.toString(),
+                            postTime = localTimeNow.toString(),
                             appLink = appLink,
                             appDescription = appDescription
                         )
                         val addAppIconData = AppIcon(
                             userId = userDataState.userId,
-                            releaseDate = localTimeNow.toString(),
+                            postTime = localTimeNow.toString(),
                             imgUrl = imageUri!!
                         )
                         Log.d("test", "$addAppData")

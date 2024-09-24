@@ -134,7 +134,12 @@ fun MainScaffold(
                         temoViewModel = temoViewModel
                     )
                 }
-                composable(Screen.Detail.route) { DetailScreen(innerPadding.calculateTopPadding()) }
+                composable(Screen.Detail.route) {
+                    DetailScreen(
+                        innerPadding = innerPadding.calculateTopPadding(),
+                        temoViewModel = temoViewModel
+                    )
+                }
             }
         },
         bottomBar = { BottomNavigationBar(navViewModel, navController) },
@@ -147,10 +152,12 @@ fun BottomNavigationBar(
     navViewModel: NavViewModel,
     navController: NavHostController
 ) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentSize(),
-        contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(),
+        contentAlignment = Alignment.Center
+    ) {
         FloatCircleButton(
             navViewModel,
             navController

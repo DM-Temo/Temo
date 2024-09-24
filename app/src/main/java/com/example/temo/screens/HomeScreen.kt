@@ -28,6 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieClipSpec
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.temo.viewmodels.App
@@ -59,23 +61,21 @@ fun HomeScreen(
 ) {
     val appSnapshot = temoViewModel.appQueryFlow.collectAsState(initial = null)
     val appListValue = appSnapshot.value?.documents ?: emptyList()
-    val appInit = App("","Loading..","Loading..","","","","",0,0)
 
     LazyColumn(
         modifier = Modifier
             .padding(top = innerPadding, start = 4.dp, end = 4.dp)
     ) {
         items(appListValue) { document ->
-            val appData = document.toObject(App::class.java) ?: appInit
-            temoViewModel.getAppIcon(
-                userId = appData.userId,
-                appId = appData.appId
-            )
-            val appIcon = temoViewModel.imageUriFlow.collectAsState(initial = null).value
+            val appData = document.toObject(App::class.java) ?: App()
+            val appIcon by produceState<Uri?>(initialValue = null) {
+                value = temoViewModel.getAppIcon(appData.userId, appData.appId)
+            }
             HomeAppCard(img = appIcon,
                 appName = appData.appName,
                 creator = appData.creator,
                 onCardClick = {
+                    temoViewModel.onAppDetailPath(appData, appIcon)
                     navViewModel.navigateToDetail(
                         navController
                     )
@@ -256,7 +256,8 @@ fun LottieImg(
         lottieAnimatable.animate(
             composition = composition,
             clipSpec = LottieClipSpec.Progress(0f, 1f),
-            initialProgress = 0f
+            initialProgress = 0f,
+            iterations = LottieConstants.IterateForever
         )
     }
     LottieAnimation(composition = composition,

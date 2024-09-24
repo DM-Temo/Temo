@@ -20,18 +20,23 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
 import com.example.temo.R
-import com.example.temo.ui.theme.TemoTheme
+import com.example.temo.viewmodels.TemoViewModel
 
 @Composable
-fun DetailScreen(innerPadding: Dp) {
+fun DetailScreen(
+    innerPadding: Dp,
+    temoViewModel: TemoViewModel
+) {
+    val appData = temoViewModel.appDetailFlow.collectAsState()
     LazyColumn(
         modifier = Modifier
             .padding(top = innerPadding)
@@ -46,7 +51,7 @@ fun DetailScreen(innerPadding: Dp) {
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.appicon_mockup),
+                    painter = rememberAsyncImagePainter(model = appData.value.appIcon),
                     contentDescription = "appImg"
                 )
             }
@@ -55,17 +60,22 @@ fun DetailScreen(innerPadding: Dp) {
                     .fillMaxWidth()
                     .padding(12.dp)
             ) {
-                val detailList = listOf("App Name", "Creator", "Post Date", "Credits")
+                val detailList = mapOf(
+                    "App Name"  to appData.value.appName,
+                    "Creator"  to appData.value.creator,
+                    "Post Date"  to appData.value.postDate,
+                    "Credits"  to "Credits"
+                )
                 detailList.forEach {
                     Row(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = it,
+                            text = it.key,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = it,
+                            text = it.value,
                             modifier = Modifier.weight(1f),
                             textAlign = TextAlign.End
                         )
@@ -73,14 +83,20 @@ fun DetailScreen(innerPadding: Dp) {
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(horizontal = 12.dp))
-            Text(text = "App Description",
+            Text(
+                text = "App Description",
                 style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(top = 8.dp, start = 8.dp))
-            Text(text = "test",
-                modifier = Modifier.padding(top = 8.dp, start = 8.dp, bottom = 24.dp))
-            Column(modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "Current Applicants : 5/20")
+                modifier = Modifier.padding(top = 8.dp, start = 8.dp)
+            )
+            Text(
+                text = appData.value.appDescription,
+                modifier = Modifier.padding(top = 8.dp, start = 8.dp, bottom = 24.dp)
+            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "Current Applicants : ${appData.value.tester}/20")
                 Button(onClick = { /*TODO*/ }) {
                     Text(text = "Test Now!")
                 }
@@ -132,12 +148,4 @@ fun DetailTopBar() {
             }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DetailPreview() {
-    TemoTheme {
-        DetailScreen(innerPadding = 0.dp)
-    }
 }

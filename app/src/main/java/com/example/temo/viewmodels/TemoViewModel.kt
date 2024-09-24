@@ -12,6 +12,7 @@ import com.google.firebase.storage.ktx.storage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 class TemoViewModel : ViewModel() {
     private val firebaseDB = Firebase.firestore
@@ -21,7 +22,9 @@ class TemoViewModel : ViewModel() {
     val appQueryFlow = MutableStateFlow<QuerySnapshot?>(null)
 
     private val _imageUriFlow = MutableStateFlow<Uri?>(null)
-    val imageUriFlow: StateFlow<Uri?> get() = _imageUriFlow
+
+    val appDetailFlow = MutableStateFlow(App())
+    val appDetailImgFlow: StateFlow<Uri?> get() = _imageUriFlow
 
     fun updateUser(
         userName: String,
@@ -77,18 +80,23 @@ class TemoViewModel : ViewModel() {
             }
     }
 
-    fun getAppIcon(
-        userId: String?,
-        appId: String?
+    suspend fun getAppIcon(userId: String?, appId: String?): Uri? {
+        if (userId == null || appId == null) return null
+        return try {
+            val imgRef = fireStorage.child("appIcon/${userId}/${appId}.jpg")
+            imgRef.downloadUrl.await()  // Firebase Task를 suspend로 변환
+        } catch (e: Exception) {
+            Log.d("storage", "img download fail: $e")
+            null
+        }
+    }
+
+    fun onAppDetailPath(
+        appDetail: App,
+        appIcon: Uri?
     ) {
-        if (userId==null || appId==null) return
-        val imgRef = fireStorage.child("appIcon/${userId}/${appId}.jpg")
-        imgRef.downloadUrl
-            .addOnSuccessListener {
-                _imageUriFlow.value = it
-            }.addOnFailureListener {
-                Log.d("storage","img download fail")
-            }
+        appDetailFlow.value = appDetail
+        appDetailFlow.value.appIcon = appIcon
     }
 }
 
@@ -99,21 +107,23 @@ data class User(
 
 data class App(
     val userId: String = "",
-    var appName: String = "",
-    var creator: String = "",
-    val releaseDate: String = "",
+    var appName: String = "Loading..",
+    var creator: String = "Loading..",
+    val postDate: String = "",
+    val postTime: String = "",
     var appLink: String = "",
     var appDescription: String = "",
-    val appId: String = userId + releaseDate,
+    val appId: String = userId + postTime,
     var tester: Int = 0,
-    var activation: Int = 0
+    var activation: Int = 0,
+    var appIcon: Uri? = null
 )
 
 data class AppIcon(
     val userId: String,
-    val releaseDate: String,
+    val postTime: String,
     val imgUrl: Uri,
-    val appId: String = userId + releaseDate
+    val appId: String = userId + postTime
 )
 
 class NavViewModel : ViewModel() {
