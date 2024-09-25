@@ -1,11 +1,18 @@
 package com.example.temo.screens
 
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -33,62 +40,136 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import com.example.temo.viewmodels.App
+import com.example.temo.viewmodels.AppIcon
 import com.example.temo.R
+import com.example.temo.viewmodels.TemoViewModel
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 @Composable
-fun AddScreen(innerPadding: Dp) {
+fun AddScreen(
+    innerPadding: Dp,
+    temoViewModel: TemoViewModel
+) {
     LazyColumn(
         modifier = Modifier
             .padding(top = innerPadding)
             .fillMaxSize()
     ) {
+        val userDataState = temoViewModel.userFlow.value
         item {
+            var appName by remember { mutableStateOf("") }
+            var creator by remember { mutableStateOf("") }
+            var appLink by remember { mutableStateOf("") }
+            var appDescription by remember { mutableStateOf("") }
+            var imageUri by remember {
+                mutableStateOf<Uri?>(null)
+            }
+            val pickMedia =
+                rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+                    imageUri = uri
+                }
+
             Box(
                 modifier = Modifier
                     .padding(vertical = 8.dp)
                     .fillMaxWidth()
-                    .height(108.dp),
+                    .height(108.dp)
+                    .pointerInput(Unit) {
+                        detectTapGestures {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .size(108.dp)
-                        .border(width = 1.dp, color = Color.Gray)
-                ) {
+                if (imageUri == null) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .size(108.dp)
+                            .border(width = 1.dp, color = Color.Gray)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.icon_add_circle),
+                            contentDescription = "defaultAppImg"
+                        )
+                        Text(
+                            text = "Add App Icon",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                } else
                     Image(
-                        painter = painterResource(id = R.drawable.icon_add_circle),
+                        painter = rememberAsyncImagePainter(imageUri),
                         contentDescription = "appImg"
                     )
-                    Text(
-                        text = "Add App Icon",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
             }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
             ) {
-                AddScreenTextField(label = "App Name")
-                AddScreenTextField(label = "Creator")
-                AddScreenTextField(label = "App Link")
-                AddScreenTextField(label = "App Description", Modifier.height(240.dp))
+                AddScreenTextField(
+                    input = appName,
+                    label = "App Name",
+                    onValueChange = { appName = it }
+                )
+                AddScreenTextField(
+                    input = creator,
+                    label = "Creator",
+                    onValueChange = { creator = it })
+                AddScreenTextField(
+                    input = appLink,
+                    label = "App Link",
+                    onValueChange = { appLink = it })
+                AddScreenTextField(
+                    input = appDescription,
+                    label = "App Description",
+                    onValueChange = { appDescription = it },
+                    Modifier.height(240.dp)
+                )
             }
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(onClick = { /*TODO*/ }) {
+                Button(onClick = {
+                    try {
+                        val localTimeNow = LocalDateTime.now()
+                        val localDateNow = LocalDate.now()
+                        val addAppData = App(
+                            userId = userDataState.userId,
+                            appName = appName,
+                            creator = creator,
+                            postDate = localDateNow.toString(),
+                            postTime = localTimeNow.toString(),
+                            appLink = appLink,
+                            appDescription = appDescription
+                        )
+                        val addAppIconData = AppIcon(
+                            userId = userDataState.userId,
+                            postTime = localTimeNow.toString(),
+                            imgUrl = imageUri!!
+                        )
+                        Log.d("test", "$addAppData")
+                        temoViewModel.addApp(addAppData, onSuccess = {})
+                        temoViewModel.addAppIcon(addAppIconData, onSuccess = {})
+                    } catch (e: Exception) {
+                        Log.e("ButtonClick", "Error: ${e.message}", e)
+                    }
+                }) {
                     Text(text = "Add")
                 }
             }
+            Spacer(modifier = Modifier.size(200.dp))
         }
     }
 }
@@ -139,13 +220,16 @@ fun AddTopBar() {
 }
 
 @Composable
-fun AddScreenTextField(label: String,
-                       modifier: Modifier = Modifier) {
-    var input by remember { mutableStateOf("") }
+fun AddScreenTextField(
+    input: String,
+    label: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     var isFocused by remember { mutableStateOf(false) }
     OutlinedTextField(
         value = input,
-        onValueChange = { input = it },
+        onValueChange = { onValueChange(it) },
         modifier = modifier
             .fillMaxWidth()
             .onFocusChanged { focusState ->
