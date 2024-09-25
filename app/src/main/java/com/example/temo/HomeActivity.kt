@@ -24,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,7 +69,6 @@ class HomeActivity : ComponentActivity() {
         setContent {
             temoViewModel
             TemoTheme {
-                temoViewModel.getApps()
                 val navController = rememberNavController()
 
                 MainScaffold(
@@ -142,7 +142,8 @@ fun MainScaffold(
                 }
             }
         },
-        bottomBar = { BottomNavigationBar(navViewModel, navController) },
+        bottomBar = {
+            BottomNavigationBar(navViewModel, navController) },
     )
 }
 

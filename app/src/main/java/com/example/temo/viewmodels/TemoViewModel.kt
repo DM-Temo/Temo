@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -18,13 +19,11 @@ class TemoViewModel : ViewModel() {
     private val firebaseDB = Firebase.firestore
     private val fireStorage = Firebase.storage.reference
 
-    val userFlow = MutableStateFlow(User(userName = "", userId = ""))
+    val userFlow = MutableStateFlow(User())
     val appQueryFlow = MutableStateFlow<QuerySnapshot?>(null)
-
-    private val _imageUriFlow = MutableStateFlow<Uri?>(null)
+    val userAppQueryFlow = MutableStateFlow<List<DocumentSnapshot>?>(null)
 
     val appDetailFlow = MutableStateFlow(App())
-    val appDetailImgFlow: StateFlow<Uri?> get() = _imageUriFlow
 
     fun updateUser(
         userName: String,
@@ -54,6 +53,8 @@ class TemoViewModel : ViewModel() {
             .set(appData)
             .addOnSuccessListener {
                 onSuccess()
+                firebaseDB.collection("Users").document(appData.userId)
+                    .set("userName" to userFlow.value.userName)
                 Log.d("firestore", "Users add success")
             }
             .addOnFailureListener {
@@ -80,6 +81,19 @@ class TemoViewModel : ViewModel() {
             }
     }
 
+    fun getUser(userId: String) {
+        firebaseDB.collection("Users").document(userId)
+            .get()
+            .addOnSuccessListener { documents ->
+                documents.reference.collection("Apps")
+                    .get()
+                    .addOnSuccessListener { apps ->
+                        userFlow.value = userFlow.value.copy(appCount = apps.size())
+                        userAppQueryFlow.value = apps.documents
+                    }
+            }
+    }
+
     suspend fun getAppIcon(userId: String?, appId: String?): Uri? {
         if (userId == null || appId == null) return null
         return try {
@@ -101,8 +115,9 @@ class TemoViewModel : ViewModel() {
 }
 
 data class User(
-    var userName: String,
-    var userId: String
+    var userName: String = "",
+    var userId: String = "",
+    var appCount: Int = 0
 )
 
 data class App(

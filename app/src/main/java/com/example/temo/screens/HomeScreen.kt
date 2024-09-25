@@ -59,6 +59,7 @@ fun HomeScreen(
     navViewModel: NavViewModel,
     navController: NavHostController
 ) {
+    temoViewModel.getApps()
     val appSnapshot = temoViewModel.appQueryFlow.collectAsState(initial = null)
     val appListValue = appSnapshot.value?.documents ?: emptyList()
 
@@ -76,9 +77,7 @@ fun HomeScreen(
                 creator = appData.creator,
                 onCardClick = {
                     temoViewModel.onAppDetailPath(appData, appIcon)
-                    navViewModel.navigateToDetail(
-                        navController
-                    )
+                    navViewModel.navigateToDetail(navController)
                 })
         }
     }
