@@ -46,11 +46,12 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.temo.viewmodels.App
-import com.example.temo.viewmodels.NavViewModel
 import com.example.temo.R
-import com.example.temo.viewmodels.TemoViewModel
+import com.example.temo.Screen
+import com.example.temo.model.App
+import com.example.temo.screens.navigation.NavViewModel
 import com.example.temo.ui.theme.customBody
+import com.example.temo.viewmodels.TemoViewModel
 
 @Composable
 fun HomeScreen(
@@ -77,7 +78,7 @@ fun HomeScreen(
                 creator = appData.creator,
                 onCardClick = {
                     temoViewModel.onAppDetailPath(appData, appIcon)
-                    navViewModel.navigateToDetail(navController)
+                    navViewModel.navigateTo(Screen.Detail.route, navController)
                 })
         }
     }

@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,20 +37,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.temo.screens.AddScreen
 import com.example.temo.screens.AddTopBar
-import com.example.temo.screens.DetailScreen
 import com.example.temo.screens.DetailTopBar
-import com.example.temo.screens.HomeScreen
 import com.example.temo.screens.HomeTopBar
-import com.example.temo.screens.ProfileScreen
 import com.example.temo.screens.ProfileTopBar
+import com.example.temo.screens.navigation.NavViewModel
+import com.example.temo.screens.navigation.TemoNavHost
 import com.example.temo.ui.theme.TemoTheme
-import com.example.temo.viewmodels.NavViewModel
 import com.example.temo.viewmodels.TemoViewModel
 
 class HomeActivity : ComponentActivity() {
@@ -111,36 +105,11 @@ fun MainScaffold(
             }
         },
         content = { innerPadding ->
-            NavHost(navController = navController, startDestination = Screen.Home.route) {
-                composable(Screen.Home.route) {
-                    HomeScreen(
-                        innerPadding = innerPadding.calculateTopPadding(),
-                        temoViewModel = temoViewModel,
-                        navViewModel = navViewModel,
-                        navController = navController
-                    )
-                }
-                composable(Screen.Profile.route) {
-                    ProfileScreen(
-                        innerPadding = innerPadding.calculateTopPadding(),
-                        temoViewModel = temoViewModel,
-                        navViewModel = navViewModel,
-                        navController = navController
-                    )
-                }
-                composable(Screen.Add.route) {
-                    AddScreen(
-                        innerPadding = innerPadding.calculateTopPadding(),
-                        temoViewModel = temoViewModel
-                    )
-                }
-                composable(Screen.Detail.route) {
-                    DetailScreen(
-                        innerPadding = innerPadding.calculateTopPadding(),
-                        temoViewModel = temoViewModel
-                    )
-                }
-            }
+            TemoNavHost(
+                navController = navController,
+                temoViewModel = temoViewModel,
+                navViewModel = navViewModel,
+                innerPadding = innerPadding)
         },
         bottomBar = {
             BottomNavigationBar(navViewModel, navController) },
@@ -206,7 +175,7 @@ fun BottomNavigationBar(
                             .size(36.dp)
                             .pointerInput(Unit) {
                                 detectTapGestures {
-                                    navViewModel.navigateToHome(navController)
+                                    navViewModel.navigateTo(Screen.Home.route, navController)
                                 }
                             }
                     )
@@ -223,7 +192,7 @@ fun BottomNavigationBar(
                             .size(36.dp)
                             .pointerInput(Unit) {
                                 detectTapGestures {
-                                    navViewModel.navigateToProfile(navController)
+                                    navViewModel.navigateTo(Screen.Profile.route, navController)
                                 }
                             }
                     )
@@ -256,7 +225,7 @@ fun FloatCircleButton(
                 .size(50.dp)
                 .pointerInput(Unit) {
                     detectTapGestures {
-                        navViewModel.navigateToAdd(navController)
+                        navViewModel.navigateTo(Screen.Add.route, navController)
                     }
                 }
         )
