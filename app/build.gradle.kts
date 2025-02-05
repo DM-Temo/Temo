@@ -1,7 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("com.google.gms.google-services")
+    id ("kotlin-kapt")
+    id ("com.google.dagger.hilt.android")
 }
 
 android {
@@ -50,6 +53,10 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -78,4 +85,9 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.coil.compose)
     implementation (libs.lottie.compose)
+    implementation (libs.dagger)
+    implementation (libs.hilt.android)
+    kapt (libs.dagger.compiler)
+    kapt (libs.hilt.compiler)
+    implementation(libs.kotlinx.metadata.jvm)
 }

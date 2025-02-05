@@ -47,7 +47,9 @@ import com.example.temo.screens.navigation.NavViewModel
 import com.example.temo.screens.navigation.TemoNavHost
 import com.example.temo.ui.theme.TemoTheme
 import com.example.temo.viewmodels.TemoViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity : ComponentActivity() {
     private val temoViewModel: TemoViewModel by viewModels()
     private val navViewModel: NavViewModel by viewModels()

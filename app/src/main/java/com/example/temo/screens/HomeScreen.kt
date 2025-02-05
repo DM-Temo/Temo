@@ -70,9 +70,12 @@ fun HomeScreen(
     ) {
         items(appListValue) { document ->
             val appData = document.toObject(App::class.java) ?: App()
-            val appIcon by produceState<Uri?>(initialValue = null) {
-                value = temoViewModel.getAppIcon(appData.userId, appData.appId)
+            var appIcon by remember { mutableStateOf<Uri?>(null) }
+
+            LaunchedEffect(appData.userId, appData.appId) {
+                appIcon = temoViewModel.getAppIcon(appData.userId, appData.appId)
             }
+
             HomeAppCard(img = appIcon,
                 appName = appData.appName,
                 creator = appData.creator,

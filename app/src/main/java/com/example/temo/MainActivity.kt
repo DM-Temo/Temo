@@ -1,6 +1,7 @@
 package com.example.temo
 
 import android.app.Activity
+import android.app.Application
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -48,8 +49,14 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 
+@HiltAndroidApp
+class TemoApplication : Application()
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
 
