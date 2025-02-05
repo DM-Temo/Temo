@@ -8,19 +8,11 @@ import kotlinx.coroutines.tasks.await
 import android.net.Uri
 import com.example.temo.model.App
 import com.example.temo.model.AppIcon
+import javax.inject.Inject
 
-object FirebaseManager {
-    val firebaseFireStore: FirebaseFirestore by lazy {
-        FirebaseFirestore.getInstance()
-    }
-    val firebaseStorage: FirebaseStorage by lazy {
-        FirebaseStorage.getInstance()
-    }
-}
-
-class UserRepository {
-    private val firebaseDB = FirebaseManager.firebaseFireStore
-
+class UserRepository @Inject constructor(
+    private val firebaseDB: FirebaseFirestore
+) {
     suspend fun getUser(userId: String): User? {
         return try {
             val document = firebaseDB.collection("Users").document(userId).get().await()
@@ -32,10 +24,10 @@ class UserRepository {
     }
 }
 
-class AppRepository {
-    private val firebaseDB = FirebaseManager.firebaseFireStore
-    private val fireStorage = FirebaseManager.firebaseStorage.reference
-
+class AppRepository @Inject constructor(
+    private val firebaseDB: FirebaseFirestore,
+    private val fireStorage: FirebaseStorage
+) {
     suspend fun getApps(): QuerySnapshot? {
         return try {
             firebaseDB.collection("Apps").whereEqualTo("activation", 0).get().await()
@@ -57,14 +49,14 @@ class AppRepository {
 
     suspend fun getAppIcon(userId: String, appId: String): Uri? {
         return try {
-            fireStorage.child("appIcon/${userId}/${appId}.jpg").downloadUrl.await()
+            fireStorage.reference.child("appIcon/${userId}/${appId}.jpg").downloadUrl.await()
         } catch (e: Exception) {
             null
         }
     }
 
     fun uploadAppIcon(appIconData: AppIcon, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
-        fireStorage.child("appIcon/${appIconData.userId}/${appIconData.appId}.jpg")
+        fireStorage.reference.child("appIcon/${appIconData.userId}/${appIconData.appId}.jpg")
             .putFile(appIconData.imgUrl)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }

@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
@@ -45,9 +46,12 @@ import com.example.temo.screens.HomeTopBar
 import com.example.temo.screens.ProfileTopBar
 import com.example.temo.screens.navigation.NavViewModel
 import com.example.temo.screens.navigation.TemoNavHost
+import com.example.temo.ui.theme.Blue20
 import com.example.temo.ui.theme.TemoTheme
 import com.example.temo.viewmodels.TemoViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity : ComponentActivity() {
     private val temoViewModel: TemoViewModel by viewModels()
     private val navViewModel: NavViewModel by viewModels()
@@ -214,8 +218,9 @@ fun FloatCircleButton(
             .offset(
                 y = (-25).dp
             )
+            .shadow(shape = CircleShape, elevation = 4.dp)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary),
+            .background(Blue20),
         contentAlignment = Alignment.Center
     ) {
         Icon(

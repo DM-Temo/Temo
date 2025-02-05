@@ -10,11 +10,14 @@ import com.example.temo.repository.AppRepository
 import com.example.temo.repository.UserRepository
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TemoViewModel(
+@HiltViewModel
+class TemoViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val appRepository: AppRepository
 ) : ViewModel() {

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.example.temo.R
+import com.example.temo.ui.theme.Blue20
 import com.example.temo.viewmodels.TemoViewModel
 
 @Composable
@@ -61,10 +63,10 @@ fun DetailScreen(
                     .padding(12.dp)
             ) {
                 val detailList = mapOf(
-                    "App Name"  to appData.value.appName,
-                    "Creator"  to appData.value.creator,
-                    "Post Date"  to appData.value.postDate,
-                    "Credits"  to "Credits"
+                    "App Name" to appData.value.appName,
+                    "Creator" to appData.value.creator,
+                    "Post Date" to appData.value.postDate,
+                    "Credits" to "Credits"
                 )
                 detailList.forEach {
                     Row(
@@ -97,7 +99,12 @@ fun DetailScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Current Applicants : ${appData.value.tester}/20")
-                Button(onClick = { /*TODO*/ }) {
+                Button(
+                    onClick = { /*TODO*/ },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Blue20
+                    )
+                ) {
                     Text(text = "Test Now!")
                 }
             }
