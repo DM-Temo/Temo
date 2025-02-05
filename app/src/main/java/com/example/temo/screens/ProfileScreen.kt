@@ -32,16 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.temo.viewmodels.NavViewModel
 import com.example.temo.R
+import com.example.temo.Screen
+import com.example.temo.model.App
+import com.example.temo.screens.navigation.NavViewModel
 import com.example.temo.viewmodels.TemoViewModel
-import com.example.temo.ui.theme.TemoTheme
-import com.example.temo.viewmodels.App
 
 @Composable
 fun ProfileScreen(
@@ -135,7 +133,7 @@ fun ProfileScreen(
                 creator = appData.creator,
                 onCardClick = {
                     temoViewModel.onAppDetailPath(appData, appIcon)
-                    navViewModel.navigateToDetail(navController)
+                    navViewModel.navigateTo(Screen.Detail.route, navController)
                 })
         }
     }
@@ -184,14 +182,4 @@ fun ProfileTopBar() {
             }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfilePreview() {
-    TemoTheme {
-        val temoViewModel = TemoViewModel()
-        val navController = rememberNavController()
-//        ProfileScreen(innerPadding = 0.dp, temoViewModel, navController)
-    }
 }
