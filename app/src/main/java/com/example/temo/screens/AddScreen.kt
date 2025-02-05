@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +49,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.temo.R
 import com.example.temo.model.App
 import com.example.temo.model.AppIcon
+import com.example.temo.ui.theme.Blue20
 import com.example.temo.viewmodels.TemoViewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -141,31 +143,36 @@ fun AddScreen(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(onClick = {
-                    try {
-                        val localTimeNow = LocalDateTime.now()
-                        val localDateNow = LocalDate.now()
-                        val addAppData = App(
-                            userId = userDataState.userId,
-                            appName = appName,
-                            creator = creator,
-                            postDate = localDateNow.toString(),
-                            postTime = localTimeNow.toString(),
-                            appLink = appLink,
-                            appDescription = appDescription
-                        )
-                        val addAppIconData = AppIcon(
-                            userId = userDataState.userId,
-                            postTime = localTimeNow.toString(),
-                            imgUrl = imageUri!!
-                        )
-                        Log.d("test", "$addAppData")
-                        temoViewModel.addApp(addAppData, onSuccess = {})
-                        temoViewModel.addAppIcon(addAppIconData, onSuccess = {})
-                    } catch (e: Exception) {
-                        Log.e("ButtonClick", "Error: ${e.message}", e)
-                    }
-                }) {
+                Button(
+                    onClick = {
+                        try {
+                            val localTimeNow = LocalDateTime.now()
+                            val localDateNow = LocalDate.now()
+                            val addAppData = App(
+                                userId = userDataState.userId,
+                                appName = appName,
+                                creator = creator,
+                                postDate = localDateNow.toString(),
+                                postTime = localTimeNow.toString(),
+                                appLink = appLink,
+                                appDescription = appDescription
+                            )
+                            val addAppIconData = AppIcon(
+                                userId = userDataState.userId,
+                                postTime = localTimeNow.toString(),
+                                imgUrl = imageUri!!
+                            )
+                            Log.d("test", "$addAppData")
+                            temoViewModel.addApp(addAppData, onSuccess = {})
+                            temoViewModel.addAppIcon(addAppIconData, onSuccess = {})
+                        } catch (e: Exception) {
+                            Log.e("ButtonClick", "Error: ${e.message}", e)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Blue20
+                    )
+                ) {
                     Text(text = "Add")
                 }
             }

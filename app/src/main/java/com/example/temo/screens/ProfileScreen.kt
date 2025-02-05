@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -39,6 +40,7 @@ import com.example.temo.R
 import com.example.temo.Screen
 import com.example.temo.model.App
 import com.example.temo.screens.navigation.NavViewModel
+import com.example.temo.ui.theme.Blue20
 import com.example.temo.viewmodels.TemoViewModel
 
 @Composable
@@ -95,7 +97,12 @@ fun ProfileScreen(
                         .padding(vertical = 6.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Button(onClick = { /*TODO*/ }) {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Blue20
+                        )
+                    ) {
                         Text(text = "Config")
                     }
                 }
